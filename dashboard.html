@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VisitorTrack Pro — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0b0d11;--surface:#12151c;--surface2:#1a1e28;--border:#252a38;--accent:#5b8af5;--accent2:#3dffc0;--accent3:#ff6b6b;--accent4:#f5a623;--text:#e2e8f4;--muted:#6b7490;--fd:'Syne',sans-serif;--fm:'JetBrains Mono',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--fd);min-height:100vh;padding-bottom:60px}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:200}
+.logo{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:800;letter-spacing:-.5px}
+.logo-dot{width:9px;height:9px;border-radius:50%;background:var(--accent2);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
+.pro-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:linear-gradient(90deg,#5b8af5,#a78bfa);color:#fff;letter-spacing:.5px}
+.hright{display:flex;gap:7px;align-items:center}
+.pill{font-family:var(--fm);font-size:11px;padding:3px 9px;border-radius:20px;background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+.pill.live{border-color:var(--accent2);color:var(--accent2)}
+button{font-family:var(--fd);font-size:12px;font-weight:600;padding:6px 13px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;transition:all .15s}
+button:hover{border-color:var(--accent);color:var(--accent)}
+button.danger:hover{border-color:var(--accent3);color:var(--accent3)}
+button.success{border-color:var(--accent2);color:var(--accent2)}
+main{max-width:1280px;margin:0 auto;padding:22px 28px}
+.snippet-bar{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px}
+.snippet-code{font-family:var(--fm);font-size:12px;color:var(--accent2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-title{font-size:18px;font-weight:800}
+.filters{display:flex;gap:7px;align-items:center}
+.filter-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;font-size:12px;background:var(--surface);border:1px solid var(--border);border-radius:7px;color:var(--text);cursor:pointer;transition:border-color .15s;font-family:var(--fd);font-weight:600}
+.filter-btn:hover{border-color:var(--accent)}
+.filter-btn svg{width:12px;height:12px;stroke:var(--muted);fill:none;stroke-width:2}
+.stat-row{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:15px 16px;transition:border-color .2s;cursor:default}
+.stat-card:hover{border-color:var(--accent)}
+.stat-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);margin-bottom:6px}
+.stat-val{font-size:24px;font-weight:800;font-family:var(--fm);letter-spacing:-1px}
+.stat-val.blue{color:var(--accent)}.stat-val.green{color:var(--accent2)}.stat-val.red{color:var(--accent3)}.stat-val.amber{color:var(--accent4)}
+.stat-sub{font-size:10px;color:var(--muted);margin-top:3px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:18px}
+.panel-top{display:flex;align-items:center;justify-content:space-between;padding:11px 18px;border-bottom:1px solid var(--border)}
+.ptabs{display:flex}
+.ptab{padding:7px 14px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.ptab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.panel-actions{display:flex;gap:7px;align-items:center}
+.stat-strip{display:flex;border-bottom:1px solid var(--border)}
+.sstat{flex:1;padding:12px 18px;border-right:1px solid var(--border)}
+.sstat:last-child{border-right:none}
+.sstat-lbl{font-size:10px;color:var(--muted);margin-bottom:3px}
+.sstat-val{font-size:20px;font-weight:800;font-family:var(--fm)}
+table{width:100%;border-collapse:collapse}
+thead th{padding:8px 14px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);text-align:left;border-bottom:1px solid var(--border)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface2)}
+tbody td{padding:9px 14px;font-size:13px;vertical-align:middle}
+.td-num{color:var(--muted);font-family:var(--fm);font-size:11px;width:32px}
+.name-cell{display:flex;align-items:center;gap:8px}
+.avatar{width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.co-logo{width:20px;height:20px;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.company-cell{display:flex;align-items:center;gap:7px}
+.act-btn{background:none;border:1px solid var(--border);padding:3px 8px;border-radius:5px;font-size:11px;color:var(--muted);cursor:pointer;transition:all .12s;font-family:var(--fd)}
+.act-btn:hover{border-color:var(--accent);color:var(--accent)}
+/* Lead score badge */
+.score{display:inline-flex;align-items:center;justify-content:center;width:36px;height:20px;border-radius:4px;font-size:11px;font-weight:700;font-family:var(--fm)}
+.score.hot{background:rgba(255,107,107,.18);color:var(--accent3)}
+.score.warm{background:rgba(245,166,35,.18);color:var(--accent4)}
+.score.cold{background:rgba(107,116,144,.18);color:var(--muted)}
+/* Heatmap */
+.heatmap-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:16px}
+.hmap-cell{border-radius:4px;aspect-ratio:1;transition:transform .15s;cursor:pointer;position:relative}
+.hmap-cell:hover{transform:scale(1.1);z-index:1}
+.hmap-day{font-size:9px;color:var(--muted);text-align:center;padding:4px 0}
+.page-heat-list{padding:14px 18px}
+.page-heat-item{display:flex;align-items:center;gap:12px;margin-bottom:10px;cursor:pointer;padding:8px 10px;border-radius:8px;transition:background .12s}
+.page-heat-item:hover{background:var(--surface2)}
+.heat-bar-wrap{flex:1}
+.heat-bar-bg{height:6px;background:var(--surface2);border-radius:3px}
+.heat-bar-fill{height:6px;border-radius:3px;transition:width .6s ease}
+.page-url{font-size:12px;font-family:var(--fm);color:var(--muted);min-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.heat-count{font-size:12px;font-family:var(--fm);min-width:30px;text-align:right}
+/* Session replay */
+.replay-item{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);transition:background .12s;cursor:pointer}
+.replay-item:hover{background:var(--surface2)}
+.replay-item:last-child{border-bottom:none}
+.replay-thumb{width:80px;height:50px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;position:relative;overflow:hidden}
+.replay-thumb::after{content:'▶';position:absolute;font-size:14px;color:var(--accent);opacity:0;transition:opacity .2s}
+.replay-item:hover .replay-thumb::after{opacity:1}
+.replay-info{flex:1}
+.replay-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.replay-meta{font-size:11px;color:var(--muted)}
+.replay-duration{font-family:var(--fm);font-size:12px;color:var(--accent2)}
+.replay-events{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
+.rev-tag{font-size:10px;padding:2px 6px;border-radius:3px;background:var(--surface2);color:var(--muted)}
+/* CRM panel */
+.crm-card{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;transition:border-color .15s}
+.crm-card:hover{border-color:var(--accent)}
+.crm-logo{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.crm-info{flex:1;margin:0 12px}
+.crm-name{font-size:14px;font-weight:600}
+.crm-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.crm-status{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px}
+.crm-status.connected{background:rgba(61,255,192,.12);color:var(--accent2)}
+.crm-status.available{background:var(--surface);color:var(--muted);border:1px solid var(--border)}
+/* Email alert panel */
+.alert-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border)}
+.alert-row:last-child{border-bottom:none}
+.alert-info{flex:1}
+.alert-title{font-size:13px;font-weight:600}
+.alert-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.toggle-wrap{position:relative;width:38px;height:21px;flex-shrink:0}
+.toggle-wrap input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:var(--surface2);border:1px solid var(--border);border-radius:21px;cursor:pointer;transition:background .2s}
+.toggle-track::after{content:'';position:absolute;top:3px;left:3px;width:13px;height:13px;border-radius:50%;background:var(--muted);transition:all .2s}
+input:checked+.toggle-track{background:var(--accent);border-color:var(--accent)}
+input:checked+.toggle-track::after{transform:translateX(17px);background:#fff}
+/* Charts */
+.charts-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.chart-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.chart-head{padding:11px 15px;border-bottom:1px solid var(--border);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
+.bar-list{padding:12px 15px}
+.bar-item{margin-bottom:10px}
+.bar-top{display:flex;justify-content:space-between;margin-bottom:4px}
+.bar-lbl{font-size:12px}.bar-cnt{font-family:var(--fm);font-size:11px;color:var(--muted)}
+.bar-track{height:4px;background:var(--surface2);border-radius:2px}
+.bar-fill{height:4px;border-radius:2px;background:var(--accent);transition:width .6s ease}
+.bar-fill.green{background:var(--accent2)}.bar-fill.red{background:var(--accent3)}.bar-fill.amber{background:var(--accent4)}
+.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+/* Notification bell */
+.notif-dot{position:absolute;top:-2px;right:-2px;width:7px;height:7px;border-radius:50%;background:var(--accent3);border:1px solid var(--bg)}
+.notif-wrap{position:relative;display:inline-flex}
+/* Toast + Alert popup */
+#toast{position:fixed;bottom:22px;right:22px;background:var(--accent2);color:#000;font-weight:700;font-size:13px;padding:9px 16px;border-radius:8px;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;z-index:999}
+#toast.show{opacity:1;transform:translateY(0)}
+.alert-popup{position:fixed;top:70px;right:22px;background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:13px 16px;width:290px;z-index:900;animation:popIn .3s ease;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+@keyframes popIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.alert-popup-title{font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:6px}
+.alert-popup-body{font-size:13px;color:var(--text)}
+.alert-popup-meta{font-size:11px;color:var(--muted);margin-top:4px}
+/* Modal */
+.moverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;align-items:center;justify-content:center}
+.moverlay.open{display:flex}
+.mbox{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:100%;max-width:530px;margin:20px;animation:mup .2s ease}
+@keyframes mup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.mhead{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border)}
+.mhead h3{font-size:15px;font-weight:700}
+.mclose{background:none;border:none;cursor:pointer;color:var(--muted);font-size:17px;padding:2px 6px;border-radius:6px}
+.mclose:hover{color:var(--text);background:var(--surface2)}
+.mbody{padding:18px 22px}
+.mdesc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.flabel{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:5px}
+.req{color:var(--accent3)}
+.uwrap{position:relative}
+.uwrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.uinput{width:100%;padding:9px 11px 9px 33px;font-family:var(--fm);font-size:13px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);outline:none;transition:border-color .15s}
+.uinput:focus{border-color:var(--accent)}
+.uinput.err{border-color:var(--accent3)}
+.uerr{font-size:11px;color:var(--accent3);margin-top:4px;display:none}
+.uerr.show{display:block}
+.track-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}
+.topt{border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;display:flex;align-items:flex-start;gap:8px;transition:all .15s}
+.topt.sel{border-color:var(--accent);background:rgba(91,138,245,.08)}
+.rdot{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--muted);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.topt.sel .rdot{border-color:var(--accent);background:var(--accent)}
+.rdot::after{content:'';width:5px;height:5px;border-radius:50%;background:#fff;display:none}
+.topt.sel .rdot::after{display:block}
+.otitle{font-size:12px;font-weight:600}
+.osub{font-size:11px;color:var(--muted);margin-top:2px}
+.addon-badge{display:inline-block;font-size:9px;font-weight:600;padding:2px 5px;border-radius:20px;background:rgba(255,107,107,.15);color:var(--accent3);margin-top:3px}
+.advtog{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;cursor:pointer;background:var(--surface2);border-radius:7px;margin-top:12px;border:1px solid var(--border);user-select:none;font-size:12px;font-weight:600}
+.advcontent{display:none;background:var(--surface2);border:1px solid var(--border);border-top:none;border-radius:0 0 7px 7px;padding:12px}
+.advcontent.show{display:block}
+.advgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.adv-f label{font-size:10px;color:var(--muted);display:block;margin-bottom:3px}
+.adv-f input{width:100%;padding:7px 9px;font-size:12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);outline:none;font-family:var(--fd)}
+.mfoot{display:flex;justify-content:flex-end;gap:8px;padding:12px 22px;border-top:1px solid var(--border)}
+.mbtn-c{padding:7px 15px;font-size:12px;font-weight:600;border-radius:7px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer}
+.mbtn-c:hover{color:var(--text)}
+.mbtn-s{padding:7px 20px;font-size:12px;font-weight:700;border-radius:7px;border:none;background:var(--accent);color:#fff;cursor:pointer;transition:opacity .15s}
+.mbtn-s:disabled{opacity:.4;cursor:not-allowed}
+.mbtn-s:not(:disabled):hover{opacity:.85}
+/* Nav tabs */
+.nav-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:18px}
+.nav-tab{padding:10px 16px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.nav-tab:hover:not(.active){color:var(--text)}
+.tab-page{display:none}
+.tab-page.active{display:block}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    VisitorTrack
+    <span class="pro-badge">PRO</span>
+  </div>
+  <div class="hright">
+    <span class="pill live">&#9679; Live</span>
+    <div class="notif-wrap">
+      <button id="notif-btn" onclick="testAlert()" title="Test alert">&#128276;</button>
+      <span class="notif-dot" id="notif-dot" style="display:none"></span>
+    </div>
+    <button onclick="exportCSV()">&#8659; CSV</button>
+    <button onclick="openModal()">+ Add domain</button>
+    <button class="danger" onclick="clearData()">&#10005; Clear</button>
+  </div>
+</header>
+
+<main>
+  <div class="snippet-bar">
+    <span class="snippet-code">&lt;script src="http://localhost:3000/pixel.js"&gt;&lt;/script&gt;</span>
+    <button onclick="copySnippet()">Copy snippet</button>
+  </div>
+
+  <!-- Stats row -->
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-lbl">Total visits</div><div class="stat-val blue" id="s-total">0</div><div class="stat-sub">All time</div></div>
+    <div class="stat-card"><div class="stat-lbl">Unique visitors</div><div class="stat-val green" id="s-unique">0</div><div class="stat-sub">Distinct URLs</div></div>
+    <div class="stat-card"><div class="stat-lbl">Identified</div><div class="stat-val" id="s-id">0</div><div class="stat-sub">With company data</div></div>
+    <div class="stat-card"><div class="stat-lbl">Today</div><div class="stat-val red" id="s-today">0</div><div class="stat-sub">Visits today</div></div>
+    <div class="stat-card"><div class="stat-lbl">Hot leads</div><div class="stat-val amber" id="s-hot">0</div><div class="stat-sub">Score &ge; 70</div></div>
+    <div class="stat-card"><div class="stat-lbl">Avg. score</div><div class="stat-val" id="s-avg">—</div><div class="stat-sub">Lead quality</div></div>
+  </div>
+
+  <!-- Section header -->
+  <div class="section-head">
+    <div class="section-title">Website visitors</div>
+    <div class="filters">
+      <div class="filter-btn" onclick="cycleDomain()">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span id="domain-lbl">All domains</span>
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="filter-btn" onclick="cycleDays()">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span id="days-lbl">Last 90 days</span>
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main nav tabs -->
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showPage('visitors',this)">&#128202; Visitors</div>
+    <div class="nav-tab" onclick="showPage('heatmap',this)">&#128293; Heatmap</div>
+    <div class="nav-tab" onclick="showPage('replay',this)">&#127910; Session replay</div>
+    <div class="nav-tab" onclick="showPage('crm',this)">&#128279; CRM integration</div>
+    <div class="nav-tab" onclick="showPage('alerts',this)">&#128276; Email alerts</div>
+  </div>
+
+  <!-- VISITORS PAGE -->
+  <div class="tab-page active" id="page-visitors">
+    <div class="panel">
+      <div class="panel-top">
+        <div class="ptabs">
+          <div class="ptab active" onclick="switchTab('companies',this)">Visited companies</div>
+          <div class="ptab" onclick="switchTab('people',this)">Visited people</div>
+          <div class="ptab" onclick="switchTab('analytics',this)">Analytics</div>
+        </div>
+        <div class="panel-actions">
+          <button onclick="toggleBlur()" style="font-size:11px;padding:4px 10px">&#128065; Blur</button>
+          <button onclick="exportCSV()" style="font-size:11px;padding:4px 10px">&#8659; Export</button>
+        </div>
+      </div>
+      <div class="stat-strip">
+        <div class="sstat"><div class="sstat-lbl">Total website visits</div><div class="sstat-val" id="ss-total">0</div></div>
+        <div class="sstat"><div class="sstat-lbl">Unique visitors</div><div class="sstat-val" id="ss-unique">0</div></div>
+        <div class="sstat"><div class="sstat-lbl">Unique identified</div><div class="sstat-val" id="ss-id">0</div></div>
+      </div>
+      <div id="tab-companies">
+        <table>
+          <thead><tr><th>#</th><th>Visitor</th><th>Company</th><th>Page</th><th>Lead score</th><th>Last seen</th><th>Actions</th></tr></thead>
+          <tbody id="companies-body"></tbody>
+        </table>
+      </div>
+      <div id="tab-people" style="display:none">
+        <table>
+          <thead><tr><th>#</th><th>Name</th><th>Company</th><th>Job title</th><th>Lead score</th><th>Actions</th></tr></thead>
+          <tbody id="people-body"></tbody>
+        </table>
+      </div>
+      <div id="tab-analytics" style="display:none;padding:18px">
+        <div class="charts-2">
+          <div class="chart-panel"><div class="chart-head">Browser</div><div class="bar-list" id="br-bars"></div></div>
+          <div class="chart-panel"><div class="chart-head">Referrer source</div><div class="bar-list" id="ref-bars"></div></div>
+          <div class="chart-panel"><div class="chart-head">Device type</div><div class="bar-list" id="dev-bars"></div></div>
+          <div class="chart-panel"><div class="chart-head">Operating system</div><div class="bar-list" id="os-bars"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEATMAP PAGE -->
+  <div class="tab-page" id="page-heatmap">
+    <div class="panel">
+      <div class="panel-top">
+        <span style="font-size:13px;font-weight:700">Page visit heatmap</span>
+        <span style="font-size:12px;color:var(--muted)">Most visited pages ranked by traffic</span>
+      </div>
+      <div class="stat-strip">
+        <div class="sstat"><div class="sstat-lbl">Top page</div><div class="sstat-val" id="hm-top" style="font-size:14px;padding-top:2px">/</div></div>
+        <div class="sstat"><div class="sstat-lbl">Total page views</div><div class="sstat-val" id="hm-total">0</div></div>
+        <div class="sstat"><div class="sstat-lbl">Unique pages</div><div class="sstat-val" id="hm-unique">0</div></div>
+      </div>
+      <div class="page-heat-list" id="heatmap-list"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-top"><span style="font-size:13px;font-weight:700">Activity calendar — last 12 weeks</span></div>
+      <div style="padding:16px">
+        <div style="display:flex;gap:4px;margin-bottom:6px">
+          <div style="width:28px"></div>
+          <div style="display:grid;grid-template-columns:repeat(12,1fr);flex:1;gap:4px" id="cal-months"></div>
+        </div>
+        <div style="display:flex;gap:4px" id="cal-wrap">
+          <div id="cal-days" style="display:flex;flex-direction:column;gap:4px;padding-top:0"></div>
+          <div id="cal-grid" style="display:grid;grid-template-columns:repeat(12,1fr);flex:1;gap:4px"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--muted)">
+          Less
+          <div style="display:flex;gap:3px">
+            <div style="width:12px;height:12px;border-radius:2px;background:var(--surface2)"></div>
+            <div style="width:12px;height:12px;border-radius:2px;background:rgba(91,138,245,.25)"></div>
+            <div style="width:12px;height:12px;border-radius:2px;background:rgba(91,138,245,.5)"></div>
+            <div style="width:12px;height:12px;border-radius:2px;background:rgba(91,138,245,.75)"></div>
+            <div style="width:12px;height:12px;border-radius:2px;background:#5b8af5"></div>
+          </div>
+          More
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSION REPLAY PAGE -->
+  <div class="tab-page" id="page-replay">
+    <div class="panel">
+      <div class="panel-top">
+        <span style="font-size:13px;font-weight:700">Session recordings</span>
+        <button onclick="addFakeSession()" style="font-size:11px;padding:4px 10px">+ Simulate session</button>
+      </div>
+      <div id="replay-list"></div>
+    </div>
+  </div>
+
+  <!-- CRM PAGE -->
+  <div class="tab-page" id="page-crm">
+    <div class="panel">
+      <div class="panel-top"><span style="font-size:13px;font-weight:700">CRM integrations</span></div>
+      <div style="padding:16px">
+        <div class="crm-card">
+          <div class="crm-logo" style="background:#ff6b35">SF</div>
+          <div class="crm-info">
+            <div class="crm-name">Salesforce</div>
+            <div class="crm-desc">Push visitor data & leads to Salesforce CRM automatically</div>
+          </div>
+          <span class="crm-status connected">&#10003; Connected</span>
+        </div>
+        <div class="crm-card">
+          <div class="crm-logo" style="background:#f97316">HS</div>
+          <div class="crm-info">
+            <div class="crm-name">HubSpot</div>
+            <div class="crm-desc">Sync contacts and company visits to HubSpot pipelines</div>
+          </div>
+          <button style="font-size:11px;padding:5px 12px" onclick="connectCRM('HubSpot')">Connect</button>
+        </div>
+        <div class="crm-card">
+          <div class="crm-logo" style="background:#6366f1">PP</div>
+          <div class="crm-info">
+            <div class="crm-name">Pipedrive</div>
+            <div class="crm-desc">Create deals automatically when high-intent visitors arrive</div>
+          </div>
+          <button style="font-size:11px;padding:5px 12px" onclick="connectCRM('Pipedrive')">Connect</button>
+        </div>
+        <div class="crm-card">
+          <div class="crm-logo" style="background:#0ea5e9">Z</div>
+          <div class="crm-info">
+            <div class="crm-name">Zoho CRM</div>
+            <div class="crm-desc">Map visitor fields to Zoho leads and contacts</div>
+          </div>
+          <button style="font-size:11px;padding:5px 12px" onclick="connectCRM('Zoho')">Connect</button>
+        </div>
+        <div class="crm-card">
+          <div class="crm-logo" style="background:#10b981">AP</div>
+          <div class="crm-info">
+            <div class="crm-name">Apollo.io</div>
+            <div class="crm-desc">Enrich visitors with Apollo contact data & sequences</div>
+          </div>
+          <button style="font-size:11px;padding:5px 12px" onclick="connectCRM('Apollo')">Connect</button>
+        </div>
+      </div>
+      <div style="padding:0 16px 16px">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:14px 16px">
+          <div style="font-size:12px;font-weight:700;margin-bottom:10px;color:var(--accent)">&#9889; Auto-push rules</div>
+          <div class="alert-row">
+            <div class="alert-info"><div class="alert-title">Push hot leads (score &ge; 70)</div><div class="alert-desc">Automatically create contacts in Salesforce for high-scoring visitors</div></div>
+            <label class="toggle-wrap"><input type="checkbox" checked onchange="toggleRule(this,'hot leads')"><span class="toggle-track"></span></label>
+          </div>
+          <div class="alert-row">
+            <div class="alert-info"><div class="alert-title">Push pricing page visitors</div><div class="alert-desc">Any visit to /pricing automatically creates a deal</div></div>
+            <label class="toggle-wrap"><input type="checkbox" onchange="toggleRule(this,'pricing page')"><span class="toggle-track"></span></label>
+          </div>
+          <div class="alert-row">
+            <div class="alert-info"><div class="alert-title">Enrich with company data</div><div class="alert-desc">Add company name, size, and industry to each lead</div></div>
+            <label class="toggle-wrap"><input type="checkbox" checked onchange="toggleRule(this,'enrich')"><span class="toggle-track"></span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMAIL ALERTS PAGE -->
+  <div class="tab-page" id="page-alerts">
+    <div class="panel">
+      <div class="panel-top">
+        <span style="font-size:13px;font-weight:700">Email alert settings</span>
+        <button onclick="testAlert()" class="success" style="font-size:11px;padding:4px 10px">&#9993; Test alert</button>
+      </div>
+      <div style="padding:6px 18px">
+        <div class="alert-row">
+          <div class="alert-info"><div class="alert-title">New visitor arrives</div><div class="alert-desc">Get notified every time someone visits your site</div></div>
+          <label class="toggle-wrap"><input type="checkbox" id="al-every" onchange="saveAlerts()"><span class="toggle-track"></span></label>
+        </div>
+        <div class="alert-row">
+          <div class="alert-info"><div class="alert-title">Hot lead detected (score &ge; 70)</div><div class="alert-desc">Instant email when a high-intent visitor is identified</div></div>
+          <label class="toggle-wrap"><input type="checkbox" id="al-hot" checked onchange="saveAlerts()"><span class="toggle-track"></span></label>
+        </div>
+        <div class="alert-row">
+          <div class="alert-info"><div class="alert-title">Pricing page visit</div><div class="alert-desc">Alert when someone views your /pricing page</div></div>
+          <label class="toggle-wrap"><input type="checkbox" id="al-pricing" checked onchange="saveAlerts()"><span class="toggle-track"></span></label>
+        </div>
+        <div class="alert-row">
+          <div class="alert-info"><div class="alert-title">Return visitor</div><div class="alert-desc">Notify when the same visitor comes back</div></div>
+          <label class="toggle-wrap"><input type="checkbox" id="al-return" onchange="saveAlerts()"><span class="toggle-track"></span></label>
+        </div>
+        <div class="alert-row">
+          <div class="alert-info"><div class="alert-title">Daily summary digest</div><div class="alert-desc">Receive a daily email with visitor stats every morning</div></div>
+          <label class="toggle-wrap"><input type="checkbox" id="al-daily" checked onchange="saveAlerts()"><span class="toggle-track"></span></label>
+        </div>
+      </div>
+      <div style="padding:14px 18px;border-top:1px solid var(--border)">
+        <div class="flabel" style="margin-bottom:6px">Alert email address</div>
+        <div style="display:flex;gap:9px">
+          <input id="alert-email" type="email" placeholder="your@email.com" style="flex:1;padding:8px 11px;font-size:13px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);outline:none;font-family:var(--fd)" oninput="document.getElementById('save-email-btn').style.opacity='1'"/>
+          <button id="save-email-btn" onclick="saveEmail()" style="opacity:.5;transition:opacity .2s">Save</button>
+        </div>
+      </div>
+    </div>
+    <!-- Recent alerts log -->
+    <div class="panel">
+      <div class="panel-top"><span style="font-size:13px;font-weight:700">Recent alerts sent</span></div>
+      <div id="alert-log">
+        <div class="empty" style="padding:30px"><p style="font-size:13px">No alerts sent yet. Click "Test alert" to simulate one.</p></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div id="toast">Copied!</div>
+
+<!-- Add Domain Modal -->
+<div class="moverlay" id="moverlay" onclick="closeOnBg(event)">
+  <div class="mbox">
+    <div class="mhead"><h3>Add new domain</h3><button class="mclose" onclick="closeModal()">&#10005;</button></div>
+    <div class="mbody">
+      <p class="mdesc">Type or paste the URL of the website you'd like to add the website tracking pixel to.</p>
+      <div class="flabel">Website URL <span class="req">*</span></div>
+      <div class="uwrap">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <input class="uinput" id="m-url" type="text" placeholder="https://yourdomain.com" oninput="mValidate()"/>
+      </div>
+      <p class="uerr" id="m-err">Please enter a valid URL starting with https://</p>
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:14px 0 7px">Tracking</div>
+      <div class="track-row">
+        <div class="topt sel" id="topt-co" onclick="mSel('co')"><div class="rdot"></div><div><div class="otitle">Company</div><div class="osub">Identify companies only</div></div></div>
+        <div class="topt" id="topt-cp" onclick="mSel('cp')"><div class="rdot"></div><div><div class="otitle">Company &amp; person</div><div class="osub">Track individuals too</div><span class="addon-badge">Inbound add-on</span></div></div>
+      </div>
+      <div class="advtog" onclick="toggleAdv()"><span>Advanced intent settings</span><span id="adv-arr">&#9662;</span></div>
+      <div class="advcontent" id="advcontent">
+        <div class="advgrid">
+          <div class="adv-f"><label>Page label</label><input type="text" placeholder="e.g. Pricing page"/></div>
+          <div class="adv-f"><label>Intent signal</label><input type="text" placeholder="e.g. High intent"/></div>
+        </div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="mbtn-c" onclick="closeModal()">Cancel</button>
+      <button class="mbtn-s" id="m-save" onclick="mSave()" disabled>Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API='http://localhost:3000';
+let allData=[],blurOn=true,alertLog=[];
+const AVC=['#5b8af5','#3dffc0','#ff6b6b','#f5a623','#a78bfa','#34d399','#f87171','#60a5fa','#fbbf24','#e879f9'];
+const COC=['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#8b5cf6','#ec4899'];
+const JOBS=['Software Engineer','Product Manager','Marketing Lead','CEO','CTO','Designer','Sales Rep','Developer','Growth Hacker','Data Analyst'];
+const PAGES=['/pricing','/features','/about','/demo','/blog','/contact','/signup','/docs'];
+
+function hc(s,a){let h=0;for(let c of s)h=(h*31+c.charCodeAt(0))&0xffff;return a[h%a.length]}
+function ta(iso){const d=(Date.now()-new Date(iso))/1000;if(d<60)return Math.floor(d)+'s ago';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago'}
+function cb(arr,k){return arr.reduce((a,v)=>{const x=v[k]||'Unknown';a[x]=(a[x]||0)+1;return a},{})}
+function leadScore(v){
+  let s=30;
+  if((v.url||'').includes('pricing'))s+=30;
+  if((v.url||'').includes('demo'))s+=25;
+  if((v.url||'').includes('signup'))s+=20;
+  if(v.referrer&&v.referrer!=='Direct')s+=10;
+  if(v.device==='Desktop')s+=5;
+  return Math.min(s,99);
+}
+function scoreBadge(s){
+  if(s>=70)return `<span class="score hot">${s}</span>`;
+  if(s>=40)return `<span class="score warm">${s}</span>`;
+  return `<span class="score cold">${s}</span>`;
+}
+function bs(w){return blurOn?`<span style="display:inline-block;background:var(--surface2);border-radius:3px;height:13px;width:${w}px;vertical-align:middle"></span>`:null}
+
+function renderBars(id,obj,cls=''){
+  const el=document.getElementById(id);if(!el)return;
+  const s=Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const mx=s[0]?.[1]||1;
+  if(!s.length){el.innerHTML='<p style="color:var(--muted);font-size:12px">No data</p>';return}
+  el.innerHTML=s.map(([l,n])=>`<div class="bar-item"><div class="bar-top"><span class="bar-lbl">${l}</span><span class="bar-cnt">${n}</span></div><div class="bar-track"><div class="bar-fill ${cls}" style="width:${(n/mx*100).toFixed(0)}%"></div></div></div>`).join('');
+}
+
+function renderCompanies(data){
+  const tb=document.getElementById('companies-body');
+  if(!data.length){tb.innerHTML=`<tr><td colspan="7"><div class="empty"><p>No visitors yet</p></div></td></tr>`;return}
+  tb.innerHTML=data.slice(0,60).map((v,i)=>{
+    const av=hc(v.url||'x',AVC);const co=hc(v.referrer||'x',COC);
+    const sc=leadScore(v);
+    const letter=(v.url||'?').replace(/^https?:\/\//,'')[0]?.toUpperCase()||'?';
+    const coL=(v.referrer||'D')[0].toUpperCase();
+    const page=(v.url||'').replace(/^https?:\/\//,'').replace(/^[^/]+/,'').slice(0,20)||'/';
+    return `<tr>
+      <td class="td-num">${i+1}</td>
+      <td><div class="name-cell"><div class="avatar" style="background:${av}">${letter}</div>${blurOn?bs(55+i%40):('<span style="font-weight:600">Visitor '+(i+1)+'</span>')}</div></td>
+      <td><div class="company-cell"><div class="co-logo" style="background:${co};color:#fff">${coL}</div>${blurOn?bs(45+i%30):('<span>'+(v.referrer||'Direct')+'</span>')}</div></td>
+      <td style="font-family:var(--fm);font-size:11px;color:var(--muted)">${page}</td>
+      <td>${scoreBadge(sc)}</td>
+      <td style="font-size:11px;color:var(--muted)">${ta(v.timestamp)}</td>
+      <td><div style="display:flex;gap:5px"><button class="act-btn">&#9993;</button><button class="act-btn">&#8644;</button><button class="act-btn">&#8943;</button></div></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPeople(data){
+  const tb=document.getElementById('people-body');
+  if(!data.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty"><p>No visitor data yet</p></div></td></tr>`;return}
+  tb.innerHTML=data.slice(0,60).map((v,i)=>{
+    const av=hc(v.browser||'x',AVC);const co=hc(v.os||'x',COC);
+    const sc=leadScore(v);const job=JOBS[i%JOBS.length];
+    return `<tr>
+      <td class="td-num">${i+1}</td>
+      <td><div class="name-cell"><div class="avatar" style="background:${av}">${(v.browser||'?')[0].toUpperCase()}</div>${blurOn?bs(55+i%40):('<span style="font-weight:600">Visitor '+(i+1)+'</span>')}</div></td>
+      <td><div class="company-cell"><div class="co-logo" style="background:${co};color:#fff">${(v.os||'O')[0].toUpperCase()}</div>${blurOn?bs(45+i%30):('<span>'+(v.os||'Unknown')+'</span>')}</div></td>
+      <td>${blurOn?bs(70+i%40):('<span style="color:var(--muted)">'+job+'</span>')}</td>
+      <td>${scoreBadge(sc)}</td>
+      <td><div style="display:flex;gap:5px"><button class="act-btn">&#9993;</button><button class="act-btn">&#8644;</button><button class="act-btn">&#8943;</button></div></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderHeatmap(data){
+  const urlCounts=cb(data,'url');
+  const sorted=Object.entries(urlCounts).sort((a,b)=>b[1]-a[1]);
+  const max=sorted[0]?.[1]||1;
+  const uniq=sorted.length;
+  const topPage=sorted[0]?.[0]||'/';
+  document.getElementById('hm-top').textContent=(topPage.replace(/^https?:\/\//,'').replace(/^[^/]+/,'')||'/').slice(0,20);
+  document.getElementById('hm-total').textContent=data.length;
+  document.getElementById('hm-unique').textContent=uniq;
+  const heatColors=['#5b8af5','#7b9cf7','#9baef9','#bbc0fb','#dbd2fd'];
+  document.getElementById('heatmap-list').innerHTML=sorted.slice(0,12).map(([url,cnt],i)=>{
+    const pct=(cnt/max*100).toFixed(0);
+    const path=url.replace(/^https?:\/\//,'').replace(/^[^/]+/,'')||'/';
+    const col=heatColors[Math.min(i,heatColors.length-1)];
+    return `<div class="page-heat-item">
+      <div class="page-url">${path.slice(0,25)}</div>
+      <div class="heat-bar-wrap"><div class="heat-bar-bg"><div class="heat-bar-fill" style="width:${pct}%;background:${col}"></div></div></div>
+      <div class="heat-count" style="color:${col}">${cnt}</div>
+    </div>`;
+  }).join('')||(data.length===0?'<div class="empty" style="padding:30px"><p>No page data yet</p></div>':'');
+
+  // Calendar
+  const cal=document.getElementById('cal-grid');
+  const weeks=12,days=7;
+  const now=new Date();
+  const cells=[];
+  for(let w=0;w<weeks;w++){
+    for(let d=0;d<days;d++){
+      const dt=new Date(now);
+      dt.setDate(now.getDate()-(weeks-1-w)*7-(days-1-d));
+      const dk=dt.toDateString();
+      const cnt2=data.filter(v=>new Date(v.timestamp).toDateString()===dk).length;
+      cells.push({cnt:cnt2});
+    }
+  }
+  const mx2=Math.max(...cells.map(c=>c.cnt),1);
+  cal.innerHTML=cells.map(c=>{
+    const op=c.cnt===0?0:0.15+0.85*(c.cnt/mx2);
+    const bg=c.cnt===0?'var(--surface2)':`rgba(91,138,245,${op.toFixed(2)})`;
+    return `<div style="width:100%;aspect-ratio:1;border-radius:2px;background:${bg}" title="${c.cnt} visits"></div>`;
+  }).join('');
+  document.getElementById('cal-days').innerHTML=['M','W','F'].map(d=>`<div style="font-size:9px;color:var(--muted);height:calc((100% - 24px)/3.5);display:flex;align-items:center">${d}</div>`).join('');
+}
+
+let sessions=[];
+function renderSessions(){
+  const el=document.getElementById('replay-list');
+  if(!sessions.length){el.innerHTML='<div class="empty" style="padding:30px"><p>No sessions recorded yet. Click "Simulate session" to add one.</p></div>';return}
+  const evTypes=['scroll','click','form','hover','nav'];
+  el.innerHTML=sessions.map((s,i)=>`
+    <div class="replay-item" onclick="playSession(${i})">
+      <div class="replay-thumb">&#127910;</div>
+      <div class="replay-info">
+        <div class="replay-title">${s.page}</div>
+        <div class="replay-meta">${s.browser} &bull; ${s.device} &bull; ${ta(s.ts)}</div>
+        <div class="replay-events">${s.events.map(e=>`<span class="rev-tag">${e}</span>`).join('')}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="replay-duration">${s.duration}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">${s.pages} pages</div>
+      </div>
+    </div>`).join('');
+}
+
+function addFakeSession(){
+  const evts=['scroll','click','form fill','hover','page nav','copy'];
+  const picks=evts.sort(()=>Math.random()-.5).slice(0,3+Math.floor(Math.random()*3));
+  sessions.unshift({
+    page:PAGES[Math.floor(Math.random()*PAGES.length)],
+    browser:['Chrome','Firefox','Safari'][Math.floor(Math.random()*3)],
+    device:['Desktop','Mobile'][Math.floor(Math.random()*2)],
+    ts:new Date().toISOString(),
+    events:picks,
+    duration:`${1+Math.floor(Math.random()*8)}:${String(Math.floor(Math.random()*60)).padStart(2,'0')}`,
+    pages:1+Math.floor(Math.random()*5)
+  });
+  renderSessions();
+  showToast('New session recorded!');
+}
+
+function playSession(i){showToast('Session replay: coming in full version!');}
+
+function testAlert(){
+  const sc=70+Math.floor(Math.random()*29);
+  const page=PAGES[Math.floor(Math.random()*PAGES.length)];
+  const now=new Date().toISOString();
+  const entry={title:'Hot lead detected',body:`New visitor on ${page} — Lead score: ${sc}`,ts:now};
+  alertLog.unshift(entry);
+  renderAlertLog();
+  // Show popup
+  const pop=document.createElement('div');
+  pop.className='alert-popup';
+  pop.innerHTML=`<div class="alert-popup-title">&#9889; Hot lead detected</div><div class="alert-popup-body">New visitor on <strong>${page}</strong></div><div class="alert-popup-meta">Lead score: ${sc} &bull; just now</div>`;
+  document.body.appendChild(pop);
+  document.getElementById('notif-dot').style.display='block';
+  setTimeout(()=>pop.remove(),4000);
+}
+
+function renderAlertLog(){
+  const el=document.getElementById('alert-log');
+  if(!alertLog.length){el.innerHTML='<div class="empty" style="padding:30px"><p>No alerts sent yet.</p></div>';return}
+  el.innerHTML=alertLog.map(a=>`
+    <div style="display:flex;align-items:flex-start;gap:12px;padding:11px 18px;border-bottom:1px solid var(--border)">
+      <span style="font-size:18px">&#9993;</span>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">${a.title}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${a.body}</div></div>
+      <div style="font-size:11px;color:var(--muted);flex-shrink:0">${ta(a.ts)}</div>
+    </div>`).join('');
+}
+
+function connectCRM(name){showToast(`${name} connected!`);}
+function toggleRule(el,name){showToast(`Rule "${name}" ${el.checked?'enabled':'disabled'}`);}
+function saveAlerts(){showToast('Alert settings saved!');}
+function saveEmail(){const e=document.getElementById('alert-email').value;if(e)showToast('Email saved: '+e);document.getElementById('save-email-btn').style.opacity='.5';}
+
+async function loadData(){
+  try{const r=await fetch(`${API}/visitors`);allData=await r.json();}catch{allData=[];}
+  const today=new Date().toDateString();
+  const todayN=allData.filter(v=>new Date(v.timestamp).toDateString()===today).length;
+  const uniq=new Set(allData.map(v=>v.url)).size;
+  const identified=Math.floor(allData.length*.42);
+  const scores=allData.map(leadScore);
+  const hot=scores.filter(s=>s>=70).length;
+  const avg=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):0;
+  document.getElementById('s-total').textContent=allData.length;
+  document.getElementById('s-unique').textContent=uniq;
+  document.getElementById('s-id').textContent=identified;
+  document.getElementById('s-today').textContent=todayN;
+  document.getElementById('s-hot').textContent=hot;
+  document.getElementById('s-avg').textContent=avg||'—';
+  document.getElementById('ss-total').textContent=allData.length;
+  document.getElementById('ss-unique').textContent=uniq;
+  document.getElementById('ss-id').textContent=identified;
+  renderCompanies(allData);renderPeople(allData);
+  renderBars('br-bars',cb(allData,'browser'));
+  renderBars('ref-bars',cb(allData,'referrer'),'green');
+  renderBars('dev-bars',cb(allData,'device'),'amber');
+  renderBars('os-bars',cb(allData,'os'));
+  renderHeatmap(allData);
+}
+
+function showPage(id,el){
+  document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  el.classList.add('active');
+}
+function switchTab(tab,el){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-companies').style.display=tab==='companies'?'block':'none';
+  document.getElementById('tab-people').style.display=tab==='people'?'block':'none';
+  document.getElementById('tab-analytics').style.display=tab==='analytics'?'block':'none';
+}
+function toggleBlur(){blurOn=!blurOn;renderCompanies(allData);renderPeople(allData);}
+const dayLabels=['Last 7 days','Last 30 days','Last 90 days','All time'];
+let dayIdx=2;
+function cycleDays(){dayIdx=(dayIdx+1)%dayLabels.length;document.getElementById('days-lbl').textContent=dayLabels[dayIdx];}
+const domOpts=['All domains','yourdomain.com','app.yourdomain.com'];
+let domIdx=0;
+function cycleDomain(){domIdx=(domIdx+1)%domOpts.length;document.getElementById('domain-lbl').textContent=domOpts[domIdx];}
+async function clearData(){if(!confirm('সব visitor log মুছে ফেলবেন?'))return;await fetch(`${API}/visitors`,{method:'DELETE'});await loadData();}
+function exportCSV(){
+  const cols=['timestamp','url','title','referrer','browser','os','device','screen'];
+  const rows=[cols.join(','),...allData.map(v=>cols.map(c=>`"${(v[c]||'').toString().replace(/"/g,'""')}"`).join(','))];
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='visitors.csv';a.click();
+  showToast('CSV downloaded!');
+}
+function copySnippet(){
+  navigator.clipboard.writeText('<script src="http://localhost:3000/pixel.js"><\/script>').then(()=>showToast('Snippet copied!'));
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function openModal(){document.getElementById('moverlay').classList.add('open');}
+function closeModal(){
+  document.getElementById('moverlay').classList.remove('open');
+  document.getElementById('m-url').value='';
+  document.getElementById('m-err').classList.remove('show');
+  document.getElementById('m-url').classList.remove('err');
+  document.getElementById('m-save').disabled=true;
+  document.getElementById('m-save').textContent='Save';
+  mSel('co');
+  document.getElementById('advcontent').classList.remove('show');
+}
+function closeOnBg(e){if(e.target===document.getElementById('moverlay'))closeModal();}
+function mValidate(){const v=document.getElementById('m-url').value.trim();const ok=/^https?:\/\/.+\..+/.test(v);document.getElementById('m-url').classList.toggle('err',v.length>0&&!ok);document.getElementById('m-err').classList.toggle('show',v.length>0&&!ok);document.getElementById('m-save').disabled=!ok;}
+function mSel(v){document.getElementById('topt-co').classList.toggle('sel',v==='co');document.getElementById('topt-cp').classList.toggle('sel',v==='cp');}
+function toggleAdv(){document.getElementById('advcontent').classList.toggle('show');document.getElementById('adv-arr').textContent=document.getElementById('advcontent').classList.contains('show')?'▲':'▾';}
+function mSave(){
+  const url=document.getElementById('m-url').value.trim();
+  const btn=document.getElementById('m-save');btn.disabled=true;btn.textContent='Saving...';
+  setTimeout(()=>{showToast(url+' added!');setTimeout(closeModal,700);},700);
+}
+loadData();
+setInterval(loadData,15000);
+// Auto-simulate a session for demo
+setTimeout(addFakeSession,2000);
+</script>
+</body>
+</html>
