@@ -7,8 +7,8 @@ const PORT = 3000;
 
 // ── Replace these with your Supabase project values ──
 // Find them at: supabase.com → your project → Settings → API
-const SUPABASE_URL = process.env.SUPABASE_URL || "https://your-project.supabase.co";
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "your-anon-key";
+const SUPABASE_URL = process.env.SUPABASE_URL || "https://olzykpobssdekcqnkhmv.supabase.co";
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "sb_publishable_KvPl1Y4D6JIu4xQFCAX0Zw_d3UZAm3N";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
