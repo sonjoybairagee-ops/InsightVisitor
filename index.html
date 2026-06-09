@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>VisitorTrack — Know Who's On Your Site</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,700;12..96,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -164,6 +165,43 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
 .fade-up{opacity:0;transform:translateY(20px);animation:fadeUp .7s ease forwards}
 @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
 .delay-1{animation-delay:.1s}.delay-2{animation-delay:.2s}.delay-3{animation-delay:.3s}.delay-4{animation-delay:.4s}
+
+/* Examples section */
+.examples{padding:80px 24px;position:relative;z-index:1}
+.lang-toggle{display:inline-flex;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:3px;margin-bottom:48px}
+.lang-btn{padding:7px 20px;font-size:13px;font-weight:600;border-radius:6px;border:none;cursor:pointer;font-family:var(--fd);transition:all .2s;color:var(--muted);background:transparent}
+.lang-btn.active{background:var(--accent);color:#fff}
+.ex-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.ex-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s}
+.ex-card:hover{border-color:rgba(79,142,247,.4)}
+.ex-top{padding:20px 22px;border-bottom:1px solid var(--border)}
+.ex-who{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.ex-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.ex-name{font-size:14px;font-weight:700}
+.ex-role{font-size:12px;color:var(--muted);margin-top:1px}
+.ex-data{display:flex;gap:8px;flex-wrap:wrap}
+.ex-chip{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;border:1px solid var(--border);color:var(--muted)}
+.ex-chip.hot{border-color:rgba(255,92,92,.3);color:var(--a3);background:rgba(255,92,92,.06)}
+.ex-chip.page{border-color:rgba(79,142,247,.3);color:var(--accent);background:rgba(79,142,247,.06)}
+.ex-chip.time{border-color:var(--border);color:var(--muted)}
+.ex-bottom{padding:18px 22px}
+.ex-action-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px}
+.ex-msg{background:var(--s2);border-radius:10px;padding:13px 15px;font-size:13px;line-height:1.65;color:var(--text);border-left:2px solid var(--accent)}
+.ex-result{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--a2);font-weight:600}
+.ex-result-dot{width:6px;height:6px;border-radius:50%;background:var(--a2);flex-shrink:0}
+
+.form-error{background:rgba(255,92,92,.08);border:1px solid rgba(255,92,92,.25);border-radius:8px;padding:10px 13px;font-size:13px;color:#ff5c5c;margin-bottom:12px;display:none}
+.form-error.show{display:block}
+.form-success{background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.25);border-radius:8px;padding:10px 13px;font-size:13px;color:#00e5a0;margin-bottom:12px;display:none}
+.form-success.show{display:block}
+.form-btn:disabled{opacity:.6;cursor:not-allowed;transform:none!important}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.verify-screen{text-align:center;padding:20px 0}
+.verify-icon{font-size:48px;margin-bottom:16px}
+.verify-title{font-size:18px;font-weight:700;margin-bottom:8px}
+.verify-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px}
+.resend-link{font-size:13px;color:var(--accent);cursor:pointer;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -177,6 +215,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
     <li><a href="#how">How it works</a></li>
     <li><a href="#features">Features</a></li>
     <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#examples">Examples</a></li>
   </ul>
   <div class="nav-btns">
     <a class="btn-ghost" onclick="openAuth('signin')">Sign in</a>
@@ -380,6 +419,25 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
   </div>
 </section>
 
+
+<section class="examples" id="examples">
+  <div class="container">
+    <div class="section-label">Real examples</div>
+    <h2 class="section-title">See it in action</h2>
+    <p class="section-sub" style="margin-bottom:32px">Real scenarios — what you see in the dashboard and what you do next.</p>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:36px">
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en',this)">English</button>
+        <button class="lang-btn" onclick="setLang('bn',this)">বাংলা</button>
+      </div>
+      <span style="font-size:13px;color:var(--muted)">Click a card to see the outreach message</span>
+    </div>
+
+    <div class="ex-grid" id="ex-grid"></div>
+  </div>
+</section>
+
 <section class="cta-section">
   <div class="container">
     <div class="cta-box">
@@ -416,7 +474,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
         <button class="tab-btn" id="tab-signup" onclick="switchTab('signup')">Sign up</button>
       </div>
 
-      <div id="form-signin">
+      <div id="form-signin"><div class="form-error" id="signin-error"></div><div class="form-success" id="signin-success"></div>
         <div class="form-group">
           <label class="form-label">Email</label>
           <input class="form-input" type="email" placeholder="you@company.com"/>
@@ -434,7 +492,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
         <div class="form-footer">No account? <a onclick="switchTab('signup')">Sign up</a></div>
       </div>
 
-      <div id="form-signup" style="display:none">
+      <div id="form-signup" style="display:none"><div class="form-error" id="signup-error"></div><div class="form-success" id="signup-success"></div>
         <div class="form-group">
           <label class="form-label">Full name</label>
           <input class="form-input" type="text" placeholder="Jane Smith"/>
@@ -461,8 +519,24 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
 </div>
 
 <script>
-function openAuth(type){document.getElementById('auth-modal').classList.add('open');switchTab(type)}
-function closeAuth(){document.getElementById('auth-modal').classList.remove('open')}
+
+// ── Supabase config ──────────────────────────────────────────
+// Replace these with your actual Supabase project values
+// supabase.com → your project → Settings → API
+const SUPABASE_URL  = 'https://your-project.supabase.co';
+const SUPABASE_KEY  = 'your-anon-public-key';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── Modal helpers ─────────────────────────────────────────────
+function openAuth(type){
+  document.getElementById('auth-modal').classList.add('open');
+  switchTab(type);
+  clearMessages();
+}
+function closeAuth(){
+  document.getElementById('auth-modal').classList.remove('open');
+  clearMessages();
+}
 function closeOnBg(e){if(e.target===document.getElementById('auth-modal'))closeAuth()}
 function switchTab(tab){
   document.getElementById('form-signin').style.display=tab==='signin'?'block':'none';
@@ -471,18 +545,215 @@ function switchTab(tab){
   document.getElementById('tab-signup').classList.toggle('active',tab==='signup');
   document.getElementById('modal-title').textContent=tab==='signin'?'Welcome back':'Start your free trial';
   document.getElementById('modal-sub').textContent=tab==='signin'?'Sign in to your account':'No credit card required';
+  clearMessages();
 }
-function handleAuth(type){
-  const btn=document.querySelector(`#form-${type} .form-btn`);
-  btn.textContent=type==='signin'?'Signing in...':'Creating account...';
-  btn.disabled=true;
-  setTimeout(()=>{closeAuth();window.location.href='dashboard.html';},1300);
+function clearMessages(){
+  ['signin-error','signin-success','signup-error','signup-success'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.classList.remove('show');el.textContent='';}
+  });
 }
-function socialLogin(p){
-  document.querySelectorAll('.social-btn').forEach(b=>{b.textContent=`Connecting to ${p}...`;b.disabled=true});
-  setTimeout(()=>{closeAuth();window.location.href='dashboard.html';},1000);
+function showError(formType, msg){
+  const el=document.getElementById(formType+'-error');
+  if(el){el.textContent=msg;el.classList.add('show');}
 }
+function showSuccess(formType, msg){
+  const el=document.getElementById(formType+'-success');
+  if(el){el.textContent=msg;el.classList.add('show');}
+}
+function setLoading(formType, loading){
+  const btn=document.querySelector(`#form-${formType} .form-btn`);
+  if(!btn) return;
+  if(loading){
+    btn.disabled=true;
+    btn.innerHTML=`<span class="spinner"></span>${formType==='signin'?'Signing in...':'Creating account...'}`;
+  } else {
+    btn.disabled=false;
+    btn.innerHTML=formType==='signin'?'Sign in &rarr;':'Create free account &rarr;';
+  }
+}
+
+// ── Sign in ───────────────────────────────────────────────────
+async function handleAuth(type){
+  clearMessages();
+  if(type==='signin'){
+    const email=document.querySelector('#form-signin input[type=email]').value.trim();
+    const password=document.querySelector('#form-signin input[type=password]').value;
+    if(!email||!password){showError('signin','Please enter your email and password.');return;}
+    setLoading('signin',true);
+    const {data,error}=await supabase.auth.signInWithPassword({email,password});
+    setLoading('signin',false);
+    if(error){
+      if(error.message.includes('Invalid login')){showError('signin','Incorrect email or password.');}
+      else if(error.message.includes('Email not confirmed')){showError('signin','Please verify your email first. Check your inbox.');}
+      else{showError('signin',error.message);}
+      return;
+    }
+    showSuccess('signin','Signed in! Redirecting...');
+    setTimeout(()=>{closeAuth();window.location.href='dashboard.html';},800);
+  } else {
+    const name=document.querySelector('#form-signup input[type=text]').value.trim();
+    const email=document.querySelector('#form-signup input[type=email]').value.trim();
+    const password=document.querySelector('#form-signup input[type=password]').value;
+    if(!name){showError('signup','Please enter your name.');return;}
+    if(!email){showError('signup','Please enter your email.');return;}
+    if(password.length<8){showError('signup','Password must be at least 8 characters.');return;}
+    setLoading('signup',true);
+    const {data,error}=await supabase.auth.signUp({
+      email, password,
+      options:{data:{full_name:name}}
+    });
+    setLoading('signup',false);
+    if(error){
+      if(error.message.includes('already registered')){showError('signup','This email is already registered. Try signing in.');}
+      else{showError('signup',error.message);}
+      return;
+    }
+    // Show email verification screen
+    document.getElementById('form-signup').innerHTML=`
+      <div class="verify-screen">
+        <div class="verify-icon">&#128231;</div>
+        <div class="verify-title">Check your inbox!</div>
+        <div class="verify-sub">
+          We sent a verification link to<br/>
+          <strong>${email}</strong><br/><br/>
+          Click the link in the email to activate your account.
+        </div>
+        <div style="font-size:13px;color:var(--muted)">
+          Didn't get it? Check spam, or
+          <span class="resend-link" onclick="resendEmail('${email}')">resend the email</span>
+        </div>
+      </div>`;
+  }
+}
+
+// ── Resend verification email ─────────────────────────────────
+async function resendEmail(email){
+  const {error}=await supabase.auth.resend({type:'signup',email});
+  if(!error) alert('Verification email resent! Check your inbox.');
+  else alert('Could not resend: '+error.message);
+}
+
+// ── Google OAuth ──────────────────────────────────────────────
+async function socialLogin(provider){
+  document.querySelectorAll('.social-btn').forEach(b=>{
+    b.innerHTML=`<span class="spinner"></span>Connecting to ${provider}...`;
+    b.disabled=true;
+  });
+  const {data,error}=await supabase.auth.signInWithOAuth({
+    provider:'google',
+    options:{redirectTo: window.location.origin+'/dashboard.html'}
+  });
+  if(error){
+    document.querySelectorAll('.social-btn').forEach(b=>{
+      b.innerHTML=`Continue with ${provider}`;
+      b.disabled=false;
+    });
+    showError('signin', error.message);
+  }
+  // On success Supabase redirects automatically
+}
+
+// ── Check session on load ─────────────────────────────────────
+// If user is already logged in, redirect to dashboard
+supabase.auth.getSession().then(({data:{session}})=>{
+  if(session) window.location.href='dashboard.html';
+});
+
+// Listen for auth state changes (e.g. OAuth redirect back)
+supabase.auth.onAuthStateChange((event,session)=>{
+  if(event==='SIGNED_IN' && session){
+    window.location.href='dashboard.html';
+  }
+});
+
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAuth()});
+
+var currentLang = 'en';
+var exampleData = [
+  {
+    avatar:'GP', color:'#4f8ef7',
+    en:{ name:'Grameenphone visitor', role:'Telecom company', page:'/pricing', score:92, time:'3 visits today',
+         msg:'Hi [Name], I noticed your team has been exploring our pricing page a few times today. Happy to walk you through a quick demo or answer any questions — just say the word!',
+         result:'Reply rate 5x higher than cold email' },
+    bn:{ name:'গ্রামীণফোনের visitor', role:'টেলিকম কোম্পানি', page:'/pricing', score:92, time:'আজকে ৩ বার',
+         msg:'হ্যালো [নাম], আমি দেখলাম আপনারা আজকে আমাদের pricing page কয়েকবার দেখেছেন। একটু কথা বলতে চাইলে বা কোনো প্রশ্ন থাকলে জানান — আমি সাথে আছি!',
+         result:'Cold email-এর চেয়ে ৫ গুণ বেশি reply' }
+  },
+  {
+    avatar:'BR', color:'#00e5a0',
+    en:{ name:'BRAC visitor', role:'NGO / Development org', page:'/demo', score:85, time:'First visit',
+         msg:'Hi [Name], saw that BRAC was checking out our demo page — we work with a few similar organizations. Would love to show you how we can help. Got 15 minutes this week?',
+         result:'Meeting booked within 2 hours' },
+    bn:{ name:'BRAC-এর visitor', role:'NGO / উন্নয়ন সংস্থা', page:'/demo', score:85, time:'প্রথম visit',
+         msg:'হ্যালো [নাম], দেখলাম BRAC আমাদের demo page দেখছে। আমরা কয়েকটি similar সংস্থার সাথে কাজ করেছি। এই সপ্তাহে ১৫ মিনিট সময় হবে?',
+         result:'২ ঘণ্টার মধ্যে meeting বুক' }
+  },
+  {
+    avatar:'SQ', color:'#f5a623',
+    en:{ name:'Square visitor', role:'Fintech company', page:'/features', score:71, time:'2nd visit this week',
+         msg:'Hey [Name], noticed your team has been back on our features page. Anything specific you're comparing us against? Happy to put together a side-by-side for you.',
+         result:'Deal closed in 8 days' },
+    bn:{ name:'Square-এর visitor', role:'ফিনটেক কোম্পানি', page:'/features', score:71, time:'এই সপ্তাহে ২য় বার',
+         msg:'হ্যালো [নাম], দেখলাম আপনারা আবার আমাদের features page দেখছেন। অন্য কোনো tool-এর সাথে compare করছেন? চাইলে একটা comparison পাঠিয়ে দিতে পারি।',
+         result:'৮ দিনে deal close' }
+  },
+  {
+    avatar:'DB', color:'#a78bfa',
+    en:{ name:'Dutch-Bangla Bank visitor', role:'Banking & finance', page:'/signup', score:78, time:'Spent 4 min on page',
+         msg:'Hi [Name], saw someone from Dutch-Bangla Bank was on our signup page for a few minutes. If anything stopped you from completing the signup, I'd love to help — or just jump on a quick call.',
+         result:'Converted to paid within 24 hours' },
+    bn:{ name:'ডাচ-বাংলা ব্যাংকের visitor', role:'ব্যাংকিং ও ফিনান্স', page:'/signup', score:78, time:'৪ মিনিট ছিলেন',
+         msg:'হ্যালো [নাম], দেখলাম ডাচ-বাংলা ব্যাংক থেকে কেউ আমাদের signup page-এ কিছুক্ষণ ছিলেন। কোনো সমস্যা হলে বা প্রশ্ন থাকলে সরাসরি call করতে পারেন।',
+         result:'২৪ ঘণ্টায় paid customer' }
+  }
+];
+
+var expandedCard = null;
+
+function renderExamples() {
+  var grid = document.getElementById('ex-grid');
+  if (!grid) return;
+  grid.innerHTML = exampleData.map(function(ex, i) {
+    var d = ex[currentLang];
+    return '<div class="ex-card" id="ex-card-'+i+'" onclick="toggleEx('+i+')">' +
+      '<div class="ex-top">' +
+        '<div class="ex-who">' +
+          '<div class="ex-avatar" style="background:'+ex.color+';color:'+( ex.color==='#00e5a0'?'#000':'#fff')+'">'+ex.avatar+'</div>' +
+          '<div><div class="ex-name">'+d.name+'</div><div class="ex-role">'+d.role+'</div></div>' +
+        '</div>' +
+        '<div class="ex-data">' +
+          '<span class="ex-chip hot">&#9889; Score '+d.score+'</span>' +
+          '<span class="ex-chip page">'+d.page+'</span>' +
+          '<span class="ex-chip time">'+d.time+'</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ex-bottom" id="ex-body-'+i+'" style="display:'+(expandedCard===i?'block':'none')+'">' +
+        '<div class="ex-action-label">What you send</div>' +
+        '<div class="ex-msg">'+d.msg+'</div>' +
+        '<div class="ex-result"><div class="ex-result-dot"></div>'+d.result+'</div>' +
+      '</div>' +
+      '<div style="padding:10px 22px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px">' +
+        '<span>'+(expandedCard===i?'&#9650; Hide':'&#9660; See outreach message')+'</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleEx(i) {
+  expandedCard = expandedCard === i ? null : i;
+  renderExamples();
+}
+
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderExamples();
+}
+
+document.addEventListener('DOMContentLoaded', renderExamples);
+
 </script>
 </body>
 </html>
