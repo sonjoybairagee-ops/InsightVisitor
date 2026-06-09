@@ -531,7 +531,6 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 function openAuth(type){
   document.getElementById('auth-modal').classList.add('open');
   switchTab(type);
-  clearMessages();
 }
 function closeAuth(){
   document.getElementById('auth-modal').classList.remove('open');
@@ -692,7 +691,7 @@ var exampleData = [
   {
     avatar:'SQ', color:'#f5a623',
     en:{ name:'Square visitor', role:'Fintech company', page:'/features', score:71, time:'2nd visit this week',
-         msg:'Hey [Name], noticed your team has been back on our features page. Anything specific you're comparing us against? Happy to put together a side-by-side for you.',
+         msg:"Hey [Name], noticed your team has been back on our features page. Anything specific you're comparing us against? Happy to put together a side-by-side for you.",
          result:'Deal closed in 8 days' },
     bn:{ name:'Square-এর visitor', role:'ফিনটেক কোম্পানি', page:'/features', score:71, time:'এই সপ্তাহে ২য় বার',
          msg:'হ্যালো [নাম], দেখলাম আপনারা আবার আমাদের features page দেখছেন। অন্য কোনো tool-এর সাথে compare করছেন? চাইলে একটা comparison পাঠিয়ে দিতে পারি।',
@@ -701,7 +700,7 @@ var exampleData = [
   {
     avatar:'DB', color:'#a78bfa',
     en:{ name:'Dutch-Bangla Bank visitor', role:'Banking & finance', page:'/signup', score:78, time:'Spent 4 min on page',
-         msg:'Hi [Name], saw someone from Dutch-Bangla Bank was on our signup page for a few minutes. If anything stopped you from completing the signup, I'd love to help — or just jump on a quick call.',
+         msg:"Hi [Name], saw someone from Dutch-Bangla Bank was on our signup page for a few minutes. If anything stopped you from completing the signup, I'd love to help — or just jump on a quick call.",
          result:'Converted to paid within 24 hours' },
     bn:{ name:'ডাচ-বাংলা ব্যাংকের visitor', role:'ব্যাংকিং ও ফিনান্স', page:'/signup', score:78, time:'৪ মিনিট ছিলেন',
          msg:'হ্যালো [নাম], দেখলাম ডাচ-বাংলা ব্যাংক থেকে কেউ আমাদের signup page-এ কিছুক্ষণ ছিলেন। কোনো সমস্যা হলে বা প্রশ্ন থাকলে সরাসরি call করতে পারেন।',
