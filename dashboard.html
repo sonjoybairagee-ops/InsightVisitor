@@ -540,14 +540,14 @@ input:checked+.toggle-track::after{transform:translateX(17px);background:#fff}
 <script>
 
 // ── Supabase config ─────────────────────────────────────────
-const SUPABASE_URL = 'https://olzykpobssdekcqnkhmv.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_KvPl1Y4D6JIu4xQFCAX0Zw_d3UZAm3N';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL = 'https://your-project.supabase.co';
+const SUPABASE_KEY = 'your-anon-public-key';
+const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
 
 // ── Auth guard — redirect to landing if not logged in ────────
 async function checkAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await _sb.auth.getSession();
   if (!session) {
     window.location.href = 'index.html';
     return;
@@ -565,7 +565,7 @@ async function checkAuth() {
 
 // ── Sign out ─────────────────────────────────────────────────
 async function signOut() {
-  await supabase.auth.signOut();
+  await _sb.auth.signOut();
   window.location.href = 'index.html';
 }
 

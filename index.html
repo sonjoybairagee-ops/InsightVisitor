@@ -374,7 +374,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
     <div class="pricing-grid">
       <div class="price-card">
         <div class="price-plan">Starter</div>
-        <div class="price-amount"><sup>$</sup>19</div>
+        <div class="price-amount"><sup>$</sup>10</div>
         <div class="price-period">per month</div>
         <ul class="price-features">
           <li><span class="pf-check">&#10003;</span>1 domain</li>
@@ -388,7 +388,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
       <div class="price-card popular">
         <div class="popular-badge">&#11088; Most popular</div>
         <div class="price-plan">Pro</div>
-        <div class="price-amount"><sup>$</sup>49</div>
+        <div class="price-amount"><sup>$</sup>30</div>
         <div class="price-period">per month</div>
         <ul class="price-features">
           <li><span class="pf-check">&#10003;</span>5 domains</li>
@@ -403,7 +403,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
       </div>
       <div class="price-card">
         <div class="price-plan">Agency</div>
-        <div class="price-amount"><sup>$</sup>99</div>
+        <div class="price-amount"><sup>$</sup>90</div>
         <div class="price-period">per month</div>
         <ul class="price-features">
           <li><span class="pf-check">&#10003;</span>Unlimited domains</li>
@@ -521,11 +521,11 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
 <script>
 
 // ── Supabase config ──────────────────────────────────────────
-// Replace these with your actual Supabase project values
+// Replace with your Supabase credentials:
 // supabase.com → your project → Settings → API
-const SUPABASE_URL  = 'https://olzykpobssdekcqnkhmv.supabase.co';
-const SUPABASE_KEY  = 'sb_publishable_KvPl1Y4D6JIu4xQFCAX0Zw_d3UZAm3N';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL = 'https://your-project.supabase.co';
+const SUPABASE_KEY = 'your-anon-public-key';
+const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ── Modal helpers ─────────────────────────────────────────────
 function openAuth(type){
@@ -580,7 +580,7 @@ async function handleAuth(type){
     const password=document.querySelector('#form-signin input[type=password]').value;
     if(!email||!password){showError('signin','Please enter your email and password.');return;}
     setLoading('signin',true);
-    const {data,error}=await supabase.auth.signInWithPassword({email,password});
+    const {data,error}=await _sb.auth.signInWithPassword({email,password});
     setLoading('signin',false);
     if(error){
       if(error.message.includes('Invalid login')){showError('signin','Incorrect email or password.');}
@@ -598,7 +598,7 @@ async function handleAuth(type){
     if(!email){showError('signup','Please enter your email.');return;}
     if(password.length<8){showError('signup','Password must be at least 8 characters.');return;}
     setLoading('signup',true);
-    const {data,error}=await supabase.auth.signUp({
+    const {data,error}=await _sb.auth.signUp({
       email, password,
       options:{data:{full_name:name}}
     });
@@ -628,7 +628,7 @@ async function handleAuth(type){
 
 // ── Resend verification email ─────────────────────────────────
 async function resendEmail(email){
-  const {error}=await supabase.auth.resend({type:'signup',email});
+  const {error}=await _sb.auth.resend({type:'signup',email});
   if(!error) alert('Verification email resent! Check your inbox.');
   else alert('Could not resend: '+error.message);
 }
@@ -639,7 +639,7 @@ async function socialLogin(provider){
     b.innerHTML=`<span class="spinner"></span>Connecting to ${provider}...`;
     b.disabled=true;
   });
-  const {data,error}=await supabase.auth.signInWithOAuth({
+  const {data,error}=await _sb.auth.signInWithOAuth({
     provider:'google',
     options:{redirectTo: window.location.origin+'/dashboard.html'}
   });
@@ -655,12 +655,12 @@ async function socialLogin(provider){
 
 // ── Check session on load ─────────────────────────────────────
 // If user is already logged in, redirect to dashboard
-supabase.auth.getSession().then(({data:{session}})=>{
+_sb.auth.getSession().then(({data:{session}})=>{
   if(session) window.location.href='dashboard.html';
 });
 
 // Listen for auth state changes (e.g. OAuth redirect back)
-supabase.auth.onAuthStateChange((event,session)=>{
+_sb.auth.onAuthStateChange((event,session)=>{
   if(event==='SIGNED_IN' && session){
     window.location.href='dashboard.html';
   }

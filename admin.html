@@ -325,9 +325,9 @@ tbody td{padding:10px 14px;font-size:13px;vertical-align:middle}
       </div>
       <div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
         <div class="stat-card"><div class="stat-lbl">Free</div><div class="stat-val blue" id="sub-free">—</div></div>
-        <div class="stat-card"><div class="stat-lbl">Starter ($19)</div><div class="stat-val green" id="sub-starter">—</div></div>
-        <div class="stat-card"><div class="stat-lbl">Pro ($49)</div><div class="stat-val amber" id="sub-pro">—</div></div>
-        <div class="stat-card"><div class="stat-lbl">Agency ($99)</div><div class="stat-val purple" id="sub-agency">—</div></div>
+        <div class="stat-card"><div class="stat-lbl">Starter ($10)</div><div class="stat-val green" id="sub-starter">—</div></div>
+        <div class="stat-card"><div class="stat-lbl">Pro ($30)</div><div class="stat-val amber" id="sub-pro">—</div></div>
+        <div class="stat-card"><div class="stat-lbl">Agency ($90)</div><div class="stat-val purple" id="sub-agency">—</div></div>
       </div>
       <div class="panel">
         <div class="panel-top"><span class="panel-title">All subscriptions</span></div>
@@ -448,15 +448,38 @@ tbody td{padding:10px 14px;font-size:13px;vertical-align:middle}
 
 <script>
 // ─── Supabase ───────────────────────────────────────────────────
-const SUPABASE_URL = 'https://olzykpobssdekcqnkhmv.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_KvPl1Y4D6JIu4xQFCAX0Zw_d3UZAm3N';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// ⚠️  Replace with your actual Supabase credentials
+// supabase.com → your project → Settings → API
+const SUPABASE_URL = 'https://your-project.supabase.co';
+const SUPABASE_KEY = 'your-anon-public-key';
+const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentAdmin = null;
 
+// Only these emails can access the admin panel
+const ADMIN_EMAILS = [
+  'admin@visitortrack.io',
+  'your@email.com'   // ← add your email here
+];
+
 async function checkAuth(){
-  const {data:{session}} = await supabase.auth.getSession();
-  if(!session){window.location.href='index.html';return;}
+  const {data:{session}} = await _sb.auth.getSession();
+  if(!session){ window.location.href='index.html'; return; }
   currentAdmin = session.user;
+
+  // Admin email check
+  if(!ADMIN_EMAILS.includes(currentAdmin.email)){
+    document.getElementById('auth-guard').innerHTML = `
+      <div style="text-align:center;padding:20px">
+        <div style="font-size:48px;margin-bottom:16px">🚫</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:8px">Access denied</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:20px">You don't have admin privileges.<br/>Contact your administrator.</div>
+        <button onclick="window.location.href='dashboard.html'" style="padding:9px 20px;background:var(--accent);border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fd)">Go to Dashboard</button>
+      </div>`;
+    document.getElementById('auth-guard').classList.remove('show');
+    document.getElementById('auth-guard').style.display='flex';
+    return;
+  }
+
   const nm = currentAdmin.user_metadata?.full_name || currentAdmin.email?.split('@')[0] || 'Admin';
   document.getElementById('admin-name').textContent = nm;
   document.getElementById('auth-guard').classList.remove('show');
@@ -464,14 +487,14 @@ async function checkAuth(){
 }
 
 async function signOut(){
-  await supabase.auth.signOut();
+  await _sb.auth.signOut();
   window.location.href = 'index.html';
 }
 checkAuth();
 
 // ─── Demo data (replace with real Supabase queries) ─────────────
 const PLANS = ['free','starter','pro','agency'];
-const PLAN_PRICE = {free:0,starter:19,pro:49,agency:99};
+const PLAN_PRICE = {free:0,starter:10,pro:30,agency:90};
 const PLAN_COLOR = {free:'gray',starter:'blue',pro:'amber',agency:'purple'};
 const STATUSES = ['active','active','active','active','active','blocked'];
 const NAMES = ['Rahim Ahmed','Sara Islam','Karim Hossain','Nadia Begum','Tanvir Chowdhury','Mitu Roy','Arif Khan','Riya Das','Sumon Mia','Puja Saha','Emran Hossain','Liza Akter','Nafis Rahman','Shirin Akhter','Bashir Uddin'];
@@ -596,6 +619,7 @@ function renderUsers(data){
       <td style="font-size:11px;color:var(--muted);font-family:var(--fm)">${fmtDate(u.joined)}</td>
       <td><div style="display:flex;gap:5px">
         <button class="tbl-btn" onclick="viewUser('${u.id}')">View</button>
+        <button class="tbl-btn" onclick="changePlan('${u.id}')">Plan</button>
         <button class="tbl-btn ${u.status==='blocked'?'success':'danger'}" onclick="toggleBlock('${u.id}')">${u.status==='blocked'?'Unblock':'Block'}</button>
       </div></td>
     </tr>`).join(''):`<tr><td colspan="7"><div class="empty">No users found</div></td></tr>`;
@@ -630,15 +654,31 @@ function viewUser(id){
     <div style="margin-top:8px">${mockDomains.filter(d=>d.owner===u.name).map(d=>`<div style="font-size:12px;font-family:var(--fm);color:var(--accent2);padding:3px 0">• ${d.domain}</div>`).join('')||'<div style="font-size:12px;color:var(--muted)">No domains</div>'}</div>`;
   document.getElementById('umodal-foot').innerHTML=`
     <button class="mbtn cancel" onclick="closeModal('user-modal')">Close</button>
+    <button class="mbtn" style="background:var(--surface2);border:1px solid var(--border);color:var(--text)" onclick="window.open('mailto:${u.email}?subject=VisitorTrack Support')">✉ Email</button>
+    <button class="mbtn" style="background:var(--accent4);border:none;color:#000" onclick="changePlan('${u.id}');closeModal('user-modal')">Change plan</button>
     <button class="mbtn ${u.status==='blocked'?'safe':'confirm'}" onclick="toggleBlock('${u.id}');closeModal('user-modal')">${u.status==='blocked'?'Unblock':'Block user'}</button>`;
   openModal('user-modal');
 }
 
+function changePlan(id){
+  const u=mockUsers.find(u=>u.id===id);if(!u)return;
+  const plan=prompt(`Change plan for ${u.name}\nCurrent: ${u.plan}\n\nEnter new plan: free, starter, pro, agency`,'');
+  if(!plan||!['free','starter','pro','agency'].includes(plan.toLowerCase().trim())) return;
+  u.plan=plan.toLowerCase().trim();
+  u.mrr=PLAN_PRICE[u.plan];
+  renderUsers(filteredUsers.map(fu=>fu.id===id?u:fu));
+  renderSubs(mockUsers);
+  updateOverview();
+  renderRevenue();
+  showToast(`✓ ${u.name}'s plan changed to ${u.plan}`);
+}
 function toggleBlock(id){
   const u=mockUsers.find(u=>u.id===id);if(!u)return;
-  u.status=u.status==='blocked'?'active':'blocked';
-  showToast(u.status==='blocked'?'User blocked':'User unblocked');
-  renderUsers(filteredUsers);
+  const wasBlocked = u.status==='blocked';
+  u.status = wasBlocked ? 'active' : 'blocked';
+  showToast(wasBlocked ? '✓ User unblocked — access restored' : '🚫 User blocked — access revoked');
+  renderUsers(filteredUsers.map(fu=>fu.id===id?u:fu));
+  renderSubs(mockUsers);
   updateOverview();
 }
 
@@ -730,6 +770,16 @@ function renderRevenue(){
 
 // ─── Domains ──────────────────────────────────────────────────────
 let filteredDomains=mockDomains;
+function removeDomain(id){
+  const d = mockDomains.find(d=>d.id===id);
+  if(!d) return;
+  if(!confirm(`Remove domain "${d.domain}"? All tracking data will be lost.`)) return;
+  const idx = mockDomains.indexOf(d);
+  if(idx>-1) mockDomains.splice(idx,1);
+  renderDomains(mockDomains);
+  showToast(`Domain "${d.domain}" removed`);
+  document.getElementById('ov-domains').textContent = mockDomains.length;
+}
 function renderDomains(data){
   filteredDomains=data;
   document.getElementById('domain-count-label').textContent=`Showing ${data.length} domain${data.length!==1?'s':''}`;
@@ -742,7 +792,8 @@ function renderDomains(data){
       <td><span class="badge ${d.status==='active'?'green':'red'}">${d.status}</span></td>
       <td style="font-family:var(--fm);font-size:12px;color:var(--muted)">${d.visitors.toLocaleString()}</td>
       <td style="font-size:11px;color:var(--muted);font-family:var(--fm)">${fmtDate(d.added)}</td>
-    </tr>`).join(''):`<tr><td colspan="7"><div class="empty">No domains found</div></td></tr>`;
+      <td><button class="tbl-btn danger" onclick="removeDomain('${d.id}')">Remove</button></td>
+    </tr>`).join(''):`<tr><td colspan="8"><div class="empty">No domains found</div></td></tr>`;
 }
 function filterDomains(){
   const q=document.getElementById('domain-search').value.toLowerCase();
@@ -839,8 +890,18 @@ function showToast(msg){
 }
 
 function refreshAll(){loadAll();showToast('Data refreshed');}
-function exportUsers(){showToast('Exporting users CSV…');}
-function exportRevenue(){showToast('Exporting revenue report…');}
+function exportUsers(){
+  const rows=['Name,Email,Plan,Status,Domains,Joined',...mockUsers.map(u=>`"${u.name}","${u.email}","${u.plan}","${u.status}","${u.domains}","${fmtDate(u.joined)}"`)];
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='visitortrack-users.csv';a.click();
+  showToast('✓ Users CSV downloaded');
+}
+function exportRevenue(){
+  const rows=['Month,MRR,New Users,Churn',...mockRevenue.map(r=>`"${r.month}","${r.mrr}","${r.new}","${r.churn}"`)];
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='visitortrack-revenue.csv';a.click();
+  showToast('✓ Revenue CSV downloaded');
+}
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('user-modal');closeModal('ticket-modal');}});
 </script>
